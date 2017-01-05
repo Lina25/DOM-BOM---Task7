@@ -1,7 +1,7 @@
 var userController = (function(){
 	var scope = this;
     var MAX_USERS_COUNT = 10;
-  
+    var MAX_AVERAGE_SALARY = 2000;
 
   function getUserText(user){
   	return user.name + ' ' + user.lastname + ' ' + user.salary + ' ' + user.position;
@@ -32,28 +32,39 @@ var userController = (function(){
   	for(var i = 0; i < scope.users.length; i++){
     	salary += Number(scope.users[i].salary) / scope.users.length;
     }
+    //if (salary > MAX_AVERAGE_SALARY) {
+      //alert('Salary could not be over 2000');
+      //return salary;
+    //}
     return salary;
   };
   
   
-  function addUserClicked (event) {
+   function addUserClicked (event) {
   	event.preventDefault();
     
     if (scope.users.length >= scope.usersCountLimit) {
       alert('Should not be more than ' + scope.usersCountLimit + ' users');
       return;
     }
-    
+
     var newUser = getUser();
     if (newUser == null) {
       alert('All fields are required');
       return;
     }
-    if (newUser.salary > 2000) {
-      alert('Salary could not be over 2000');
+    
+    scope.users.push(newUser);
+    var avgSalary = scope.users.length ? getAverageSalary() : newUser.salary;
+    if (avgSalary > MAX_AVERAGE_SALARY) {
+    	var index = scope.users.indexOf(newUser);
+    	if(index !== -1){
+      	scope.users.splice(index, 1);
+      }
+      alert('Average salary could not be over 2000');
       return;
-    }
-    users.push(newUser);
+    }    
+    
     var newUserText = getUserText(newUser);
     var userHtmlElement = document.createElement("li");
   	userHtmlElement.appendChild(document.createTextNode(newUserText));
@@ -62,6 +73,7 @@ var userController = (function(){
     updateUsersCount();
     updateUsersSalary();
   };
+  
   
   function maxUserCountChanged (event) {
   	scope.usersCountLimit = scope.maxUsersCount.value;
